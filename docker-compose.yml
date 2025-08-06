@@ -1,0 +1,79 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: authdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5439:5432"
+    networks:
+      - app-network
+
+  users:
+    build: ./users
+    container_name: users
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: user
+      DB_PASS: password
+      DB_NAME: authdb
+      JWT_SECRET: smartnx
+    ports:
+      - "3001:3001"
+    networks:
+      - app-network
+
+  posts:
+    build: ./posts
+    container_name: posts
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: user
+      DB_PASS: password
+      DB_NAME: authdb  
+    ports:
+      - "3002:3002"  
+    networks:
+      - app-network
+    command: ["./wait-for-it.sh", "postgres:5432", "--", "node", "src/index.js"]
+
+  comments:
+    build: ./comments
+    container_name: comments
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: user
+      DB_PASS: password
+      DB_NAME: authdb
+    ports:
+      - "3003:3003"
+    networks:
+      - app-network
+    command: ["sh", "-c", "./wait-for-it.sh postgres:5432 -- npx sequelize-cli db:migrate && node src/index.js"]
+
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:
+    driver: bridge
