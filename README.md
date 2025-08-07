@@ -103,7 +103,7 @@ POST http://localhost:3001/auth/login
 ```
 
   Com o token em mãos, você pode realizar requisições para as rotas protegidas da aplicação. Para isso, inclua o token na variavel que foi criada em blog-api e coloque em current value
-  <img width="1495" height="195" alt="image" src="https://github.com/user-attachments/assets/11ff5f11-5613-4729-b18a-b6e68d25b047" />
+  <img width="1496" height="204" alt="image" src="https://github.com/user-attachments/assets/81f25119-dffc-46fa-bde9-a719be0658a8" />
 
 ## 2 - Criação de posts e Autenticação
 
