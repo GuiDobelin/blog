@@ -4,4 +4,4 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 EXPOSE 3001
-CMD ["node", "server.js"]
+CMD ["sh", "-c", "sleep 10 && node src/index.js"]

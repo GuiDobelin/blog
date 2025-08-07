@@ -1,6 +1,7 @@
 const express = require('express');
+const { sequelize } = require('../models');
 const app = express();
-const port = process.env.PORT || 3003;
+const PORT = process.env.PORT || 3003;
 require('dotenv').config();
 
 
@@ -9,6 +10,16 @@ app.use(express.json());
 const commentRoutes = require('../src/routes/commentRoutes');
 app.use('/comments', commentRoutes);
 
-app.listen(port, () => {
-  console.log(`Comments service is running on port ${port}`);
+app.listen(PORT, async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('Conectado ao banco de dados com sucesso.');
+
+    await sequelize.sync();
+    console.log('Tabelas sincronizadas com sucesso.');
+
+    console.log(`posts rodando na porta ${PORT}`);
+  } catch (error) {
+    console.error('Erro ao conectar ao banco de dados:', error);
+  }
 });

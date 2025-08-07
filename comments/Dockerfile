@@ -4,4 +4,4 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 EXPOSE 3003
-CMD ["sh", "./wait-for-it.sh", "postgres:5432", "--", "node", "src/index.js"]
+CMD ["sh", "-c", "sleep 10 && node src/index.js"]

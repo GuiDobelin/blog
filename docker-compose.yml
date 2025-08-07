@@ -6,9 +6,9 @@ services:
     container_name: postgres_db
     restart: always
     environment:
-      POSTGRES_DB: authdb
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
@@ -23,34 +23,34 @@ services:
     depends_on:
       - postgres
     environment:
-      DB_HOST: postgres
+      DB_HOST: ${DB_HOST}
       DB_PORT: 5432
-      DB_USER: user
-      DB_PASS: password
-      DB_NAME: authdb
-      JWT_SECRET: smartnx
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
     ports:
       - "3001:3001"
     networks:
       - app-network
-
+    
   posts:
     build: ./posts
     container_name: posts
     restart: always
     depends_on:
       - postgres
+      - users 
     environment:
-      DB_HOST: postgres
+      DB_HOST: ${DB_HOST}
       DB_PORT: 5432
-      DB_USER: user
-      DB_PASS: password
-      DB_NAME: authdb  
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
     ports:
       - "3002:3002"  
     networks:
       - app-network
-    command: ["./wait-for-it.sh", "postgres:5432", "--", "node", "src/index.js"]
 
   comments:
     build: ./comments
@@ -58,17 +58,17 @@ services:
     restart: always
     depends_on:
       - postgres
+      - posts
     environment:
-      DB_HOST: postgres
+      DB_HOST: ${DB_HOST}
       DB_PORT: 5432
-      DB_USER: user
-      DB_PASS: password
-      DB_NAME: authdb
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_NAME: ${DB_NAME}
     ports:
       - "3003:3003"
     networks:
       - app-network
-    command: ["sh", "-c", "./wait-for-it.sh postgres:5432 -- npx sequelize-cli db:migrate && node src/index.js"]
 
 
 volumes:
