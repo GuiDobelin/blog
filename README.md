@@ -38,7 +38,7 @@ Após iniciar os containers, os  microsserviços estarão disponíveis em (http:
 
 ## Postman Collection
 
-Aqui tem collention para baixar  ➝ .
+Aqui tem collention para baixar  ➝ [docs](docs/blog.postman_collection.json.)
 
 ### Importar a Coleção no Postman
 
