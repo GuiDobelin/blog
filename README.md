@@ -1,6 +1,4 @@
-# blog
 
-Desafio Técnico - Desenvolvedor Back-end Jr
 
 ## Pré-requisitos
 
