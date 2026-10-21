@@ -6,7 +6,7 @@ const createPost = async (req, res) => {
     const { title, content } = req.body;
 
     if (!title || !content) {
-      return res.status(400).json({ message: 'Campos obrigatórios: title e content' });
+      return res.status(400).json({ message: 'Campos obrigatÃ³rios: title e content' });
     }
 
     const newPost = await Post.create({
@@ -24,7 +24,6 @@ const createPost = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
   try {
-    console.log('Usuário autenticado:', req.user); 
     const posts = await Post.findAll();
     return res.status(200).json(posts);
   } catch (error) {
@@ -42,11 +41,11 @@ const updatePost = async (req, res) => {
         const post = await Post.findByPk(id);
 
         if (!post) {
-            return res.status(404).json({ message: 'Post não encontrado' });
+            return res.status(404).json({ message: 'Post nÃ£o encontrado' });
         }
 
         if (post.userId !== userId) {
-            return res.status(403).json({ message: 'Você não tem permissão para editar este post' });
+            return res.status(403).json({ message: 'VocÃª nÃ£o tem permissÃ£o para editar este post' });
         }
 
         post.title = title || post.title;
@@ -68,11 +67,11 @@ const deletePost = async (req, res) => {
         const post = await Post.findByPk(id);
 
         if (!post) {
-            return res.status(404).json({ message: 'Post não encontrado' });
+            return res.status(404).json({ message: 'Post nÃ£o encontrado' });
         }
 
         if (post.userId !== userId) {
-            return res.status(403).json({ message: 'Você não tem permissão para deletar este post' });
+            return res.status(403).json({ message: 'VocÃª nÃ£o tem permissÃ£o para deletar este post' });
         }
 
         await post.destroy();

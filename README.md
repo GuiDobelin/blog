@@ -1,68 +1,116 @@
+<h1 align="center">📝 Blog API: Microsserviços</h1>
 
+<p align="center">
+  API de blog dividida em três microsserviços independentes (<b>usuários</b>, <b>posts</b> e <b>comentários</b>), com autenticação JWT, PostgreSQL e Docker Compose.
+</p>
 
-## Pré-requisitos
+<p align="center">
+  <img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js">
+  <img src="https://img.shields.io/badge/Express-000000?style=flat-square&logo=express&logoColor=white" alt="Express">
+  <img src="https://img.shields.io/badge/Sequelize-52B0E7?style=flat-square&logo=sequelize&logoColor=white" alt="Sequelize">
+  <img src="https://img.shields.io/badge/PostgreSQL_15-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker">
+  <img src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" alt="JWT">
+</p>
 
-Antes de executar o projeto, certifique-se de ter as seguintes ferramentas instaladas:
+---
 
-- [Docker](https://www.docker.com/get-started)
-- [Docker Compose](https://docs.docker.com/compose/install/)
+## 📚 Sumário
 
-## Configuração e Execução com Docker
+- [Arquitetura](#-arquitetura)
+- [Tecnologias](#-tecnologias)
+- [Como executar](#-como-executar)
+- [Endpoints](#-endpoints)
+- [Exemplos de uso](#-exemplos-de-uso)
+- [Postman](#-postman)
+- [Estrutura de pastas](#-estrutura-de-pastas)
 
-### 1. Clone o repositório
+## 🏗️ Arquitetura
+
+```
+                ┌──────────────┐
+                │   Cliente    │
+                └──────┬───────┘
+        ┌──────────────┼──────────────┐
+        ▼              ▼              ▼
+ ┌────────────┐ ┌────────────┐ ┌────────────┐
+ │   users    │ │   posts    │ │  comments  │
+ │   :3001    │ │   :3002    │ │   :3003    │
+ └─────┬──────┘ └─────┬──────┘ └─────┬──────┘
+       └──────────────┼──────────────┘
+                      ▼
+              ┌───────────────┐
+              │ PostgreSQL 15 │
+              └───────────────┘
+```
+
+- **users**: cadastro e login; gera o token JWT.
+- **posts**: CRUD de posts (rotas protegidas por JWT). Só o autor pode editar ou remover o próprio post.
+- **comments**: CRUD de comentários nos posts (rotas protegidas por JWT). Só o autor pode editar ou remover o próprio comentário.
+
+### Modelagem do banco
+
+<img width="946" alt="Diagrama do banco de dados" src="https://github.com/user-attachments/assets/a0fe751f-e2e8-49c6-9e3f-df1354857b73" />
+
+## 🛠️ Tecnologias
+
+| Camada | Tecnologia |
+|---|---|
+| Runtime | Node.js |
+| Framework | Express |
+| ORM / migrations | Sequelize + Sequelize CLI |
+| Banco de dados | PostgreSQL 15 |
+| Autenticação | JSON Web Token + bcrypt |
+| Infraestrutura | Docker e Docker Compose |
+
+## ▶️ Como executar
+
+**Pré-requisitos:** [Docker](https://www.docker.com/get-started) e [Docker Compose](https://docs.docker.com/compose/install/).
 
 ```bash
+# 1. Clone o repositório
 git clone https://github.com/GuiDobelin/blog.git
+cd blog
+
+# 2. Suba os containers
+docker compose up --build
+
+# 3. Para parar e remover
+docker compose down
 ```
 
-### 2. Construção e execução dos containers
+Serviços disponíveis:
 
-```bash
-docker-compose up --build
-```
+| Serviço | URL |
+|---|---|
+| users | http://localhost:3001 |
+| posts | http://localhost:3002 |
+| comments | http://localhost:3003 |
+| PostgreSQL | `localhost:5439` |
 
-### 3. Parar e remover os containers
+> ℹ️ Os arquivos `.env` estão versionados de propósito para facilitar a execução local. Eles contêm apenas valores de desenvolvimento e **não devem ser usados em produção**.
 
-```bash
-docker-compose down
-```
+## 🔗 Endpoints
 
-### 4. Acessando a aplicação
+🔒 = requer header `Authorization: Bearer <token>`
 
-Após iniciar os containers, os  microsserviços estarão disponíveis em (http://localhost:3001), (http://localhost:3002), (http://localhost:3003).
+| Método | Rota | Serviço | Descrição |
+|---|---|---|---|
+| `POST` | `/auth/register` | users | Cria um usuário |
+| `POST` | `/auth/login` | users | Faz login e retorna o token |
+| `GET` | `/posts` | posts | Lista posts 🔒 |
+| `POST` | `/posts` | posts | Cria um post 🔒 |
+| `PUT` | `/posts/:id` | posts | Atualiza um post 🔒 |
+| `DELETE` | `/posts/:id` | posts | Remove um post 🔒 |
+| `GET` | `/comments?postId=` | comments | Lista comentários (filtro opcional por post) 🔒 |
+| `POST` | `/comments` | comments | Cria um comentário 🔒 |
+| `PUT` | `/comments/:id` | comments | Atualiza um comentário 🔒 |
+| `DELETE` | `/comments/:id` | comments | Remove um comentário 🔒 |
 
-## Modelagem do Banco de Dados
-<img width="946" height="548" alt="Diagrama de banco de dados" src="https://github.com/user-attachments/assets/a0fe751f-e2e8-49c6-9e3f-df1354857b73" />
+## 💡 Exemplos de uso
 
-## Postman Collection
-
-Aqui tem collention para baixar  ➝ [docs](docs/blog.postman_collection.json.)
-
-### Importar a Coleção no Postman
-
-1. Abra o Postman.
-2. Vá até "File" > "Import".
-3. Selecione a aba "Upload Files".
-4. Escolha o arquivo `.json` baixado.
-
-### Configurando o Ambiente no Postman
-
-1. No Postman, clique em "Environments" no painel à esquerda.
-2. Clique em "Add" para criar um novo ambiente.
-3. Nomeie o ambiente como `blog-api`.
-4. Adicione uma nova variável chamada `token`, onde você deve colar o token de autenticação obtido após o login, precedido por Bearer.
-5. Salve as mudanças.
-
-### Passo a Passo: 
-## 1 - Criação de Usuário e token
-
-   Para criar um novo usuário, envie uma requisição POST para a rota `/auth/register` com os seguintes campos no corpo da requisição:
-
-**Exemplo de Requisição:**
-
-POST http://localhost:3001/auth/register
-- Body: raw
-- Content-Type: application/json
+<details>
+<summary><b>1. Cadastrar usuário</b>: <code>POST :3001/auth/register</code></summary>
 
 ```json
 {
@@ -71,14 +119,20 @@ POST http://localhost:3001/auth/register
   "password": "password"
 }
 ```
-  Após criar o usuário, você precisará realizar o login para obter o token de autenticação. Envie uma requisição POST para a rota `auth/login` com as credenciais de username e password.
 
-**Exemplo de Requisição:**
+**Resposta** (`201 Created`)
+```json
+{
+  "message": "Usuário registrado com sucesso",
+  "user": { "id": "seu_id", "name": "name", "email": "name@email.com" }
+}
+```
+</details>
 
-POST http://localhost:3001/auth/login
-- Body: raw
-- Content-Type: application/json
+<details>
+<summary><b>2. Login</b>: <code>POST :3001/auth/login</code></summary>
 
+**Requisição**
 ```json
 {
   "email": "name@email.com",
@@ -86,61 +140,42 @@ POST http://localhost:3001/auth/login
 }
 ```
 
-**Exemplo de Resposta:**
-
+**Resposta**
 ```json
 {
-    "message": "Login bem-sucedido",
-    "token": "seu_token",
-    "user": {
-        "id": "seu_id",
-        "name": "name",
-        "email": "name@email.com"
-    }
+  "message": "Login bem-sucedido",
+  "token": "seu_token",
+  "user": { "id": "seu_id", "name": "name", "email": "name@email.com" }
 }
 ```
+</details>
 
-  Com o token em mãos, você pode realizar requisições para as rotas protegidas da aplicação. Para isso, inclua o token na variavel que foi criada em blog-api e coloque em current value
-  <img width="1496" height="204" alt="image" src="https://github.com/user-attachments/assets/81f25119-dffc-46fa-bde9-a719be0658a8" />
+<details>
+<summary><b>3. Criar post</b>: <code>POST :3002/posts</code> 🔒</summary>
 
-## 2 - Criação de posts e Autenticação
-
-   Para criar um novo posts, envie uma requisição POST para a rota `/posts` com os seguintes campos no corpo da requisição:
-
-**Exemplo de Requisição:**
-
-POST http://localhost:3002/posts
-- Body: raw
-- Content-Type: application/json
-- Authorization: Bearer Token
-
+**Requisição**
 ```json
 {
-  "title": "title ",
+  "title": "title",
   "content": "content"
 }
 ```
-**Exemplo de Resposta:**
+
+**Resposta**
 ```json
 {
-    "id": "postId",
-    "userId": "userId",
-    "title": "title ",
-    "content": "content",
-    "updatedAt": "datetime",
-    "createdAt": "datetime"
+  "id": "postId",
+  "userId": "userId",
+  "title": "title",
+  "content": "content",
+  "updatedAt": "datetime",
+  "createdAt": "datetime"
 }
 ```
-### Update de posts e Autenticação
+</details>
 
-   Para atualizar um post, envie uma requisição PUT para a rota `/posts/{ id do post }` com os seguintes campos no corpo da requisição:
-
-**Exemplo de Requisição:**
-
-PUT http://localhost:3002/posts/{ id do post }
-- Body: raw
-- Content-Type: application/json
-- Authorization: Bearer Token
+<details>
+<summary><b>4. Atualizar post</b>: <code>PUT :3002/posts/:id</code> 🔒</summary>
 
 ```json
 {
@@ -148,110 +183,77 @@ PUT http://localhost:3002/posts/{ id do post }
   "content": "content updated"
 }
 ```
-**Exemplo de Resposta:**
+</details>
+
+<details>
+<summary><b>5. Remover post</b>: <code>DELETE :3002/posts/:id</code> 🔒</summary>
+
 ```json
-{
-    "id": "id do post",
-    "userId": "userId",
-    "title": "new title",
-    "content": "content updated",
-    "createdAt": "datetime",
-    "updatedAt": "datetime"
-}
+{ "message": "Post deletado com sucesso" }
 ```
-### delete de posts e Autenticação
+</details>
 
-   Para atualizar um post, envie uma requisição DELETE para a rota `/posts/{id do post}` com os seguintes campos no corpo da requisição:
-
-**Exemplo de Requisição:**
-
-DELETE http://localhost:3002/posts/{ id do post }
-- Body: raw
-- Content-Type: application/json
-- Authorization: Bearer Token
-
-**Exemplo de Resposta:**
-```json
-{
-    "message": "Post deletado com sucesso"
-}
-```
-
-## 3 - Criação de comments e Autenticação
-
-   Para criar um novo comentario, envie uma requisição POST para a rota `/comments` com os seguintes campos no corpo da requisição:
-
-**Exemplo de Requisição:**
-
-POST http://localhost:3003/comments
-- Body: raw
-- Content-Type: application/json
-- Authorization: Bearer Token
+<details>
+<summary><b>6. Criar comentário</b>: <code>POST :3003/comments</code> 🔒</summary>
 
 ```json
 {
   "postId": "postId",
-  "userId": "userId",
   "content": "content"
 }
 ```
-**Exemplo de Resposta:**
-```json
-{
-    "id": "id",
-    "postId": "postId",
-    "userId": "userId",
-    "content": "content",
-    "updatedAt": "datetime",
-    "createdAt": "datetime"
-}
-```
-### Update de comments e Autenticação
 
-   Para atualizar um comentario, envie uma requisição PUT para a rota `/comments/{id do comentario}` com os seguintes campos no corpo da requisição:
+O autor do comentário (`userId`) é obtido automaticamente do token.
+</details>
 
-**Exemplo de Requisição:**
-
-PUT http://localhost:3003/comments/{id do comentario}
-- Body: raw
-- Content-Type: application/json
-- Authorization: Bearer Token
+<details>
+<summary><b>7. Atualizar comentário</b>: <code>PUT :3003/comments/:id</code> 🔒</summary>
 
 ```json
-{
-  "content": "New content updated"
-}
-
+{ "content": "New content updated" }
 ```
-**Exemplo de Resposta:**
+</details>
+
+<details>
+<summary><b>8. Remover comentário</b>: <code>DELETE :3003/comments/:id</code> 🔒</summary>
+
 ```json
-{
-    "id": "id",
-    "postId": "postId",
-    "userId": "userId",
-    "content": "New content updated",
-    "updatedAt": "datetime",
-    "createdAt": "datetime"
-}
+{ "message": "Comentario deletado com sucesso" }
 ```
-### delete de comments e Autenticação
+</details>
 
-   Para deletar um comments, envie uma requisição DELETE para a rota `/comments/{id do comentario}` com os seguintes campos no corpo da requisição:
+## 📮 Postman
 
-**Exemplo de Requisição:**
+A coleção está em [`docs/blog.postman_collection.json`](docs/blog.postman_collection.json).
 
-DELETE http://localhost:3003/comments/{id do comentario}
-- Body: raw
-- Content-Type: application/json
-- Authorization: Bearer Token
+1. No Postman, vá em **File → Import** e selecione o arquivo.
+2. Crie um ambiente chamado `blog-api`.
+3. Adicione a variável `token` e cole o token recebido no login (precedido de `Bearer `) em **Current value**.
 
-**Exemplo de Resposta:**
-```json
-{
-    "message": "Comentario deletado com sucesso"
-}
+<img width="1496" alt="Configuração do ambiente no Postman" src="https://github.com/user-attachments/assets/81f25119-dffc-46fa-bde9-a719be0658a8" />
+
+## 📁 Estrutura de pastas
+
+```
+blog/
+├── docker-compose.yml
+├── docs/                 # Coleção do Postman
+├── users/                # Serviço de usuários e autenticação
+│   ├── src/              # controllers, routes, models, index.js
+│   ├── migrations/
+│   └── Dockerfile
+├── posts/                # Serviço de posts
+│   ├── src/
+│   ├── middlewares/      # Validação do JWT
+│   ├── migrations/
+│   └── Dockerfile
+└── comments/             # Serviço de comentários
+    ├── src/
+    ├── middleware/       # Validação do JWT
+    ├── migrations/
+    └── Dockerfile
 ```
 
-### Observações
+---
 
-O arquivo `.env` foi incluído no repositório para facilitar o uso e configuração do projeto. Ele contém as variáveis de ambiente necessárias para a execução do banco de dados PostgreSQL e configurações do Node.js.
+<p align="center">Feito por <a href="https://github.com/GuiDobelin">Guilherme Dobelin</a></p>

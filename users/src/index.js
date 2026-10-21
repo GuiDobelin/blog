@@ -16,7 +16,7 @@ app.listen(PORT, async () => {
     await sequelize.sync();
     console.log('Tabelas sincronizadas com sucesso.');
 
-    console.log(`posts rodando na porta ${PORT}`);
+    console.log(`users rodando na porta ${PORT}`);
   } catch (error) {
     console.error('Erro ao conectar ao banco de dados:', error);
   }
